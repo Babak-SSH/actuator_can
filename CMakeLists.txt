@@ -15,3 +15,6 @@ include_directories("/usr/local/include/lcm/")
 add_library(socketcan SHARED
     "include/SocketCAN.h" "src/SocketCAN.cpp"
 )
+add_library(actuator SHARED 
+    "include/actuator.hpp" "src/actuator.cpp"
+)
