@@ -11,3 +11,7 @@ include_directories("include/")
 include_directories("types/")
 include_directories("/usr/include/")
 include_directories("/usr/local/include/lcm/")
+
+add_library(socketcan SHARED
+    "include/SocketCAN.h" "src/SocketCAN.cpp"
+)
