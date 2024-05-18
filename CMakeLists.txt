@@ -16,5 +16,15 @@ add_library(socketcan SHARED
     "include/SocketCAN.h" "src/SocketCAN.cpp"
 )
 add_library(actuator SHARED 
-    "include/actuator.hpp" "src/actuator.cpp"
+    "include/Actuator.hpp" "src/Actuator.cpp"
+)
+
+add_executable(test_actuators "test/single_loop.cpp" "test/parallel_loops.cpp")
+target_link_libraries(test_actuators PUBLIC actuator socket_can lcm -lpthread)
+target_compile_options(test_actuators PUBLIC -std=c++14 -Wall -Wextra -pedantic -Wfloat-conversion -fdiagnostics-color=auto -g -O3 -fPIC)
+install(
+    TARGETS test_actuators
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
 )
