@@ -19,11 +19,16 @@ add_library(actuator SHARED
     "include/Actuator.hpp" "src/Actuator.cpp"
 )
 
-add_executable(test_actuators "test/single_loop.cpp" "test/parallel_loops.cpp")
-target_link_libraries(test_actuators PUBLIC actuator socket_can lcm -lpthread)
-target_compile_options(test_actuators PUBLIC -std=c++14 -Wall -Wextra -pedantic -Wfloat-conversion -fdiagnostics-color=auto -g -O3 -fPIC)
+add_executable(single_loop "test/single_loop.cpp")
+target_link_libraries(single_loop PUBLIC actuator socketcan lcm)
+target_compile_options(single_loop PUBLIC -std=c++14 -Wall -Wextra -pedantic -Wfloat-conversion -fdiagnostics-color=auto -g -O3 -fPIC)
+
+add_executable(parallel_loops "test/parallel_loops.cpp")
+target_link_libraries(parallel_loops PUBLIC actuator socketcan lcm -lpthread)
+target_compile_options(parallel_loops PUBLIC -std=c++14 -Wall -Wextra -pedantic -Wfloat-conversion -fdiagnostics-color=auto -g -O3 -fPIC)
+
 install(
-    TARGETS test_actuators
+    TARGETS single_loop parallel_loops
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
