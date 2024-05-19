@@ -5,7 +5,7 @@
 #include <chrono>
 #include <thread>
 
-#include "actuator.hpp"
+#include "Actuator.hpp"
 
 
 /// motor indexes 
@@ -175,24 +175,20 @@ int main() {
     /// results
     std::cout << "1: loops: " << loopCount1 << "\n1: total commands: " << loopCount1*3 << std::endl;
     std::cout << "1: average time for each loop: " << totalTime1/loopCount1 << " millis" << std::endl;
-    std::cout << "1: response under timeout: " << leg1.r << std::endl;
+    std::cout << "leg1 response count: " << leg1.responseCount << std::endl;
 
     std::cout << "2: loops: " << loopCount2 << "\n2: total commands: " << loopCount2*3 << std::endl;
     std::cout << "2: average time for each loop: " << totalTime2/loopCount2 << " millis" << std::endl;
-    std::cout << "2: response under timeout: " << leg1.r << std::endl;
+    std::cout << "leg2 response count: " << leg2.responseCount << std::endl;
 
     std::cout << "3: loops: " << loopCount3 << "\n3: total commands: " << loopCount3*3 << std::endl;
     std::cout << "3: average time for each loop: " << totalTime3/loopCount3 << " millis" << std::endl;
-    std::cout << "3: response under timeout: " << leg3.r << std::endl;
+    std::cout << "leg3 response count: " << leg3.responseCount << std::endl;
 
     std::cout << "4: loops: " << loopCount4 << "\n4: total commands: " << loopCount4*3 << std::endl;
     std::cout << "4: average time for each loop: " << totalTime4/loopCount4 << " millis" << std::endl;
-    std::cout << "4: response under timeout: " << leg4.r << std::endl;
-
-    std::cout << "leg1 response count: " << leg1.responseCount << std::endl;
-    std::cout << "leg2 response count: " << leg2.responseCount << std::endl;
-    std::cout << "leg3 response count: " << leg3.responseCount << std::endl;
     std::cout << "leg4 response count: " << leg4.responseCount << std::endl;
+
     std::cout << "total response count: " << leg1.responseCount+leg1.responseCount+leg1.responseCount+leg1.responseCount << std::endl;
 
     /// disable motors

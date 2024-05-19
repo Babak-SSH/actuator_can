@@ -5,7 +5,7 @@
 #include <chrono>
 #include <thread>
 
-#include "actuator.hpp"
+#include "Actuator.hpp"
 
 
 /// motor indexes
