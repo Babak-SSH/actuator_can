@@ -14,7 +14,7 @@
 #include <ctime>
 #include <unistd.h>
 
-#include "actuator.hpp"
+#include "Actuator.hpp"
 
 
 using namespace std;
@@ -75,7 +75,6 @@ void Actuator::rx_handler(can_frame_t* frame) {
     DATA.current = result[3];
     lcm.publish("RESP", &DATA);
     responseCount++;
-    available = true;
 }
 
 /// command to enable motor 
@@ -202,7 +201,7 @@ float *Actuator::unpack_data(can_frame_t frame) {
     return result;
 }
 
-void static Actuator::decToBinary(int n, int *binaryNum) {
+void Actuator::decToBinary(int n, int *binaryNum) {
     for (int i = 7; i >= 0; i--)
     {
         binaryNum[i] = n % 2;
@@ -210,7 +209,7 @@ void static Actuator::decToBinary(int n, int *binaryNum) {
     }
 }
 
-int static Actuator::binaryToDec(int *binaryNum) {
+int Actuator::binaryToDec(int *binaryNum) {
     int decimal = 0;
 
     for (int i = 0; i < 4; i++)
