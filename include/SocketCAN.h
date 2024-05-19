@@ -8,8 +8,7 @@
 #if (!defined(SOCKETCAN_H)) && (!defined(MINGW))
 #define SOCKETCAN_H
 
-#include <CANAdapter.h>
-#include <CANFrame.h>
+#include <linux/can.h>
 #include <stdbool.h>
 // IFNAMSIZ, ifreq
 #include <net/if.h>
@@ -17,6 +16,22 @@
 #include <pthread.h>
 #include <string>
 
+// Workaround for absent linux headers: Explicit struct definition
+/* struct can_frame
+{
+    uint32_t    can_id;
+    uint8_t     can_dlc;
+    uint8_t     __pad;
+    uint8_t     __res0;
+    uint8_t     __res1;
+    uint8_t     data[8] __attribute__((aligned(8)));
+}; */
+
+/**
+ * Holds the content of one CAN frame
+ * Struct delcared in <linux/can.h>
+ */
+typedef struct can_frame can_frame_t;
 
 /**
  * Interface request structure used for socket ioctl's
@@ -32,8 +47,7 @@ typedef struct sockaddr_can can_socket_address_t;
 /**
  * Facilitates frame transmission and reception via a CAN adapter
  */
-class SocketCAN: public CANAdapter
-{
+class SocketCAN {
   private:
     std::string __can_conf_1;
     std::string __can_conf_2;
@@ -61,6 +75,12 @@ class SocketCAN: public CANAdapter
     SocketCAN(std::function<void(can_frame_t*)>);
     /** Destructor */
     ~SocketCAN();
+
+    /**
+     * Pointer to a function which shall be called
+     * when frames are being received from the CAN bus
+     */
+    std::function<void(can_frame_t*)> reception_handler;
 
     /**
      * Open and bind socket
