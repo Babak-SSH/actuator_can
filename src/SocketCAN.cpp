@@ -4,6 +4,7 @@
  * and transmit CAN frames via SocketCAN.
  */
 
+#include <string>
 #ifndef MINGW
 
 #include "SocketCAN.h"
@@ -20,8 +21,7 @@
 
 
 SocketCAN::SocketCAN(std::function<void(can_frame_t*)> reception_handler)
-:sockfd(-1), receiver_thread_id(0) {
-    adapter_type = ADAPTER_SOCKETCAN;
+:reception_handler{std::move(reception_handler)},sockfd(-1), receiver_thread_id(0) {
     printf("SocketCAN adapter created.\n");
 }
 
@@ -37,10 +37,10 @@ SocketCAN::~SocketCAN() {
 void SocketCAN::open(const char* interface) {
 
     // Setting can interface
-    __can_conf_1 = "sudo ip link set " + interface + " type can bitrate 1000000";
-    __can_conf_2 = "sudo ifconfig " + interface + " txqueuelen 65536";
-    __can_conf_3 = "sudo ifconfig " + interface + " up";
-    __can_conf_4 = "sudo ifconfig " + interface + " down";
+    __can_conf_1 = "sudo ip link set " + std::to_string(*interface) + " type can bitrate 1000000";
+    __can_conf_2 = "sudo ifconfig " + std::to_string(*interface) + " txqueuelen 65536";
+    __can_conf_3 = "sudo ifconfig " + std::to_string(*interface) + " up";
+    __can_conf_4 = "sudo ifconfig " + std::to_string(*interface) + " down";
 
 
     system(this->__can_conf_4.c_str());
@@ -144,7 +144,7 @@ static void* socketcan_receiver_thread(void* argv) {
         FD_ZERO(&descriptors);
         // Add socket descriptor
         FD_SET(sock->sockfd, &descriptors);
-       printf("Added %d to monitored descriptors.\n", sock->sockfd);
+    //    printf("Added %d to monitored descriptors.\n", sock->sockfd);
 
         // Set timeout
         timeout.tv_sec  = 0;
