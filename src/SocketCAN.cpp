@@ -7,8 +7,6 @@
 #include <string>
 #ifndef MINGW
 
-#include "SocketCAN.h"
-
 #include <stdio.h>
 // strncpy
 #include <string.h>
@@ -19,12 +17,13 @@
 // SIOCGIFINDEX
 #include <sys/ioctl.h>
 
+#include "SocketCAN.h"
 
-SocketCAN::SocketCAN(std::function<void(can_frame_t*)> reception_handler)
-:reception_handler{std::move(reception_handler)},sockfd(-1), receiver_thread_id(0) {
+
+SocketCAN::SocketCAN(std::function<void(can_frame_t*)> reception_handler_f)
+:reception_handler{std::move(reception_handler_f)},sockfd(-1), receiver_thread_id(0) {
     printf("SocketCAN adapter created.\n");
 }
-
 
 SocketCAN::~SocketCAN() {
     printf("Destroying SocketCAN adapter...\n");
@@ -32,7 +31,6 @@ SocketCAN::~SocketCAN() {
         this->close();
     }
 }
-
 
 void SocketCAN::open(const char* interface) {
 
@@ -42,11 +40,23 @@ void SocketCAN::open(const char* interface) {
     __can_conf_3 = "sudo ifconfig " + std::to_string(*interface) + " up";
     __can_conf_4 = "sudo ifconfig " + std::to_string(*interface) + " down";
 
-
-    system(this->__can_conf_4.c_str());
-    system(this->__can_conf_1.c_str());
-    system(this->__can_conf_2.c_str());
-    system(this->__can_conf_3.c_str());
+    int systemRet;
+    systemRet = system(this->__can_conf_4.c_str());
+    if (systemRet == -1) {
+	printf("can down command failed");
+    }
+    systemRet = system(this->__can_conf_1.c_str());
+    if (systemRet == -1) {
+	printf("can bitrate command failed");
+    }
+    systemRet = system(this->__can_conf_2.c_str());
+    if (systemRet == -1) {
+	printf("can queue command failed");
+    }
+    systemRet = system(this->__can_conf_3.c_str());
+    if (systemRet == -1) {
+	printf("can up command failed");
+    }
 
     // Request a socket
     sockfd = socket(PF_CAN, SOCK_RAW, CAN_RAW);
@@ -118,7 +128,6 @@ void SocketCAN::transmit(can_frame_t* can_frame) {
     }
 }
 
-
 static void* socketcan_receiver_thread(void* argv) {
     /*
      * The first and only argument to this function
@@ -173,7 +182,6 @@ static void* socketcan_receiver_thread(void* argv) {
     // Thread terminates
     return NULL;
 }
-
 
 void SocketCAN::start_receiver_thread() {
     /*
