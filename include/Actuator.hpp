@@ -15,7 +15,7 @@ class Actuator {
     private:
         SocketCAN* adapter;
         lcm::LCM lcm;
-        actuatorlcm::actuator_response_t DATA;
+        actuator_response_t DATA;
     public:
         /**
          * @brief response count for each actuator
@@ -26,15 +26,14 @@ class Actuator {
          * @brief optional timeout after each command transmit
          * 
          */
-        double timeout;
+	    // double command_timeout;
         /**
          * @brief response
          * 
          */
-        float *result;
+        float *response;
         int __data[8] = {0,0,0,0,0,0,0,0};
         float __pose_shift;
-        struct can_frame frame;
         struct can_filter rfilter[1];
         /**
          * @brief Construct a new Actuator object
