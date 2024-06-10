@@ -1,7 +1,7 @@
 /**
  * @file
  * This file declares an interface to SocketCAN,
- * to facilitates frame transmission and reception.
+ * to facilitate frame transmission and reception.
  */
 
 #include <functional>
@@ -16,7 +16,7 @@
 #include <pthread.h>
 #include <string>
 
-// Workaround for absent linux headers: Explicit struct definition
+// Workaround for absent Linux headers: Explicit struct definition
 /* struct can_frame
 {
     uint32_t    can_id;
@@ -46,8 +46,7 @@ typedef struct sockaddr_can can_socket_address_t;
 
 /**
  * Facilitates frame transmission and reception via a CAN adapter
- */
-class SocketCAN {
+ */class SocketCAN {
   private:
     std::string __can_conf_1;
     std::string __can_conf_2;
@@ -55,32 +54,30 @@ class SocketCAN {
     std::string __can_conf_4;
 
     interface_request_t if_request;
-
-    can_socket_address_t addr;
-
-    pthread_t receiver_thread_id;
-
   public:
-    /**
-     * CAN socket file descriptor
-     */
-    int sockfd = -1;
-
-    /**
-     * Request for the child thread to terminate
-     */
-    bool terminate_receiver_thread = false;
-
     /** Constructor */
     SocketCAN(std::function<void(can_frame_t*)>);
     /** Destructor */
     ~SocketCAN();
 
+    can_socket_address_t addr;
     /**
      * Pointer to a function which shall be called
      * when frames are being received from the CAN bus
      */
     std::function<void(can_frame_t*)> reception_handler;
+    
+	/**
+     * CAN socket file descriptor
+     */
+    int sockfd;
+	
+    pthread_t receiver_thread_id;
+
+    /**
+     * Request for the child thread to terminate
+     */
+    bool terminate_receiver_thread = false;
 
     /**
      * Open and bind socket
@@ -88,7 +85,7 @@ class SocketCAN {
     void open(const char*);
 
     /**
-     * Close and unbind socket
+     * Close and unbind the socket
      */
     void close();
 
