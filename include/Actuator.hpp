@@ -15,7 +15,7 @@ class Actuator {
     private:
         SocketCAN* adapter;
         lcm::LCM lcm;
-        actuator_response_t DATA;
+        actuatorlcm::actuator_response_t DATA;
     public:
         /**
          * @brief response count for each actuator
