@@ -24,9 +24,14 @@ using std::chrono::system_clock;
 
 /// Actuator class
 Actuator::Actuator(string can_index) {
-    // double command_timeout = 10000 ; // microseconds
+    // double command_timeout = 1000 ; // microseconds
     __pose_shift = 0.5;
     response = new float[4];
+    m_index = 0;
+    cycle_responses = new float*[3];
+    for( int i=0; i<3; ++i ) {
+        cycle_responses[i] = new float[4];
+    }
     responseCount = 0;
     adapter = new SocketCAN(std::bind(&Actuator::rx_handler, this, std::placeholders::_1));
     adapter->open(can_index.c_str());
@@ -34,10 +39,12 @@ Actuator::Actuator(string can_index) {
 
 /// callback function to handle recieved data from motors
 void Actuator::rx_handler(can_frame_t* frame) {
+    cycle_responses[m_index][0] = frame->data[0];
     response[0] = frame->data[0];
 
     int p_data = frame->data[1] * 16 * 16 + frame->data[2];
     float p = p_data * (190. / 65535.) - 95.5;
+    cycle_responses[m_index][1] = p;
     response[1] = p;
 
     int b4[8];
@@ -54,10 +61,12 @@ void Actuator::rx_handler(can_frame_t* frame) {
     float v = (v_data * 90) / 4095. - 45;
 
     response[2] = v;
+    cycle_responses[m_index][2] = v;
 
     int i_data = d4_low * 16 * 16 + frame->data[5];
     float i = (i_data * 36) / 4095. - 18;
     response[3] = i;
+    cycle_responses[m_index][3] = i;
 
     // pack it and send it to lcm
     DATA.id = response[0];
@@ -66,6 +75,7 @@ void Actuator::rx_handler(can_frame_t* frame) {
     DATA.current = response[3];
     lcm.publish("RESP", &DATA);
     responseCount++;
+    m_index = (m_index+1)%3;
 }
 
 /// command to enable motor 
@@ -142,7 +152,7 @@ void Actuator::command(int id, double p_d, double v_d, double kp, double kd, dou
     delete[] data;
 
     // if needed there can be a delay between each send adjusted by timeout (uncomment below line) 
-    // std::this_thread::sleep_for(std::chrono::microseconds(command_timeout));
+    std::this_thread::sleep_for(std::chrono::microseconds(1000));
 }
 
 float *Actuator::pack_data(double p_d, double v_d, double kp, double kd, double ff) {

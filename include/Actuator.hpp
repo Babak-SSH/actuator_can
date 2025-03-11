@@ -32,6 +32,8 @@ class Actuator {
          * 
          */
         float *response;
+        int m_index;
+        float **cycle_responses;
         int __data[8] = {0,0,0,0,0,0,0,0};
         float __pose_shift;
         struct can_filter rfilter[1];
